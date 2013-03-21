@@ -4,8 +4,8 @@
 #include <sys/time.h>
 #include <omp.h>
 
-#include "../include/tsc.h"
-#include "../include/ppx_sockets.h"
+#include "/home/mic/PPX/Benchmarks/include/tsc.h"
+#include "/home/mic/PPX/Benchmarks/include/ppx_sockets.h"
 
 
 #include <iostream>
@@ -253,7 +253,7 @@ int main(int argc, const char* argv[]) {
         	//warmup	
 		start = mdsecnd();
 		while (mdsecnd() - start < sec ) {
-			test_dp_mac_AVX(threads,2e6,1);
+			run_test(threads,2e6,1);
 		}
 
 
