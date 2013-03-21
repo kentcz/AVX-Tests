@@ -59,7 +59,7 @@ double test_AVX(double x,double y,size_t iterations){
 			//
             r0 = _mm256_add_pd(r0,rF);
             r1 = _mm256_mul_pd(r1,rE);
-	    	r2 = _mm256_sub_pd(r2,rD);
+            r2 = _mm256_sub_pd(r2,rD);
             r3 = _mm256_mul_pd(r3,rC);
             r4 = _mm256_add_pd(r4,rF);
             r5 = _mm256_mul_pd(r5,rE);
@@ -72,7 +72,7 @@ double test_AVX(double x,double y,size_t iterations){
 
             r0 = _mm256_mul_pd(r0,rC);
             r1 = _mm256_add_pd(r1,rD);
-	    	r2 = _mm256_mul_pd(r2,rE);
+            r2 = _mm256_mul_pd(r2,rE);
             r3 = _mm256_sub_pd(r3,rF);
             r4 = _mm256_mul_pd(r4,rC);
             r5 = _mm256_add_pd(r5,rD);
@@ -85,7 +85,7 @@ double test_AVX(double x,double y,size_t iterations){
 
             r0 = _mm256_add_pd(r0,rF);
             r1 = _mm256_mul_pd(r1,rE);
-	    	r2 = _mm256_sub_pd(r2,rD);
+            r2 = _mm256_sub_pd(r2,rD);
             r3 = _mm256_mul_pd(r3,rC);
             r4 = _mm256_add_pd(r4,rF);
             r5 = _mm256_mul_pd(r5,rE);
@@ -98,7 +98,7 @@ double test_AVX(double x,double y,size_t iterations){
 
             r0 = _mm256_mul_pd(r0,rC);
             r1 = _mm256_add_pd(r1,rD);
-	    	r2 = _mm256_mul_pd(r2,rE);
+            r2 = _mm256_mul_pd(r2,rE);
             r3 = _mm256_sub_pd(r3,rF);
             r4 = _mm256_mul_pd(r4,rC);
             r5 = _mm256_add_pd(r5,rD);
