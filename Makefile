@@ -1,7 +1,6 @@
 PPXFLAGS = -DPPXHOST=\"$(PPX_LVHOST)\"
 
 avx : avx_bench.cpp
-	#g++ $(PPXFLAGS) -DILP -DILP2 -fopenmp -mavx -O3 -o avx avx_bench.cpp
 	g++ $(PPXFLAGS) -fopenmp -mavx -O3 -o avx avx_bench.cpp
 
 sse : sse_bench.cpp
