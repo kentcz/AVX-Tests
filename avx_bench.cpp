@@ -243,10 +243,9 @@ int main(int argc, const char* argv[]) {
 	int iters = 5;	
 	int threads = 4;	
 
-	if (argc >= 1) threads = atoi(argv[1]);
-	if (argc >= 2) iters = atoi(argv[2]);
-	if (argc >= 3) sec = atoi(argv[3]);
-
+	if (argc >= 2) threads = atoi(argv[1]);
+	if (argc >= 3) iters = atoi(argv[2]);
+	if (argc >= 4) sec = atoi(argv[3]);
 
 	// Mode 1 : Fixed Time
 	if (sec != 0) {
@@ -276,7 +275,6 @@ int main(int argc, const char* argv[]) {
 	
 	// Mode 2 : Fixed Iterations
 	else {
-	
 		run_test(threads,iters * 1e6,0);
 	}
 
