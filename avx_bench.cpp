@@ -11,6 +11,12 @@
 #include <iostream>
 using namespace std;
 
+
+
+//
+// Each iteration contains 48,000 instructions
+//  x and y are used to seed the data
+//
 double test_AVX(double x,double y,size_t iterations){
     register __m256d r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,rA,rB,rC,rD,rE,rF;
 
@@ -43,75 +49,65 @@ double test_AVX(double x,double y,size_t iterations){
     size_t c = 0;
     while (c < iterations){
         size_t i = 0;
-        while (i < 1000){
-            //  Here's the meat - the part that really matters.
+        while (i < 1000) {
+
+			// 
+            // This is the primary task
+			//  each block contains 12 AVX instructions
+			//    - 48 Instructions per loop
+			//    - 48*4 = 192 flops per loop
+			//
             r0 = _mm256_add_pd(r0,rF);
             r1 = _mm256_mul_pd(r1,rE);
-	    r2 = _mm256_sub_pd(r2,rD);
+	    	r2 = _mm256_sub_pd(r2,rD);
             r3 = _mm256_mul_pd(r3,rC);
-#ifndef ILP2
             r4 = _mm256_add_pd(r4,rF);
             r5 = _mm256_mul_pd(r5,rE);
-#endif
-#ifndef ILP
             r6 = _mm256_sub_pd(r6,rD);
             r7 = _mm256_mul_pd(r7,rC);
             r8 = _mm256_add_pd(r8,rF);
             r9 = _mm256_mul_pd(r9,rE);
             rA = _mm256_sub_pd(rA,rD);
             rB = _mm256_mul_pd(rB,rC);
-#endif
 
             r0 = _mm256_mul_pd(r0,rC);
             r1 = _mm256_add_pd(r1,rD);
-	    r2 = _mm256_mul_pd(r2,rE);
+	    	r2 = _mm256_mul_pd(r2,rE);
             r3 = _mm256_sub_pd(r3,rF);
-#ifndef ILP2
             r4 = _mm256_mul_pd(r4,rC);
             r5 = _mm256_add_pd(r5,rD);
-#endif
-#ifndef ILP
             r6 = _mm256_mul_pd(r6,rE);
             r7 = _mm256_sub_pd(r7,rF);
             r8 = _mm256_mul_pd(r8,rC);
             r9 = _mm256_add_pd(r9,rD);
             rA = _mm256_mul_pd(rA,rE);
             rB = _mm256_sub_pd(rB,rF);
-#endif
 
             r0 = _mm256_add_pd(r0,rF);
             r1 = _mm256_mul_pd(r1,rE);
-	    r2 = _mm256_sub_pd(r2,rD);
+	    	r2 = _mm256_sub_pd(r2,rD);
             r3 = _mm256_mul_pd(r3,rC);
-#ifndef ILP2
             r4 = _mm256_add_pd(r4,rF);
             r5 = _mm256_mul_pd(r5,rE);
-#endif
-#ifndef ILP
             r6 = _mm256_sub_pd(r6,rD);
             r7 = _mm256_mul_pd(r7,rC);
             r8 = _mm256_add_pd(r8,rF);
             r9 = _mm256_mul_pd(r9,rE);
             rA = _mm256_sub_pd(rA,rD);
             rB = _mm256_mul_pd(rB,rC);
-#endif
 
             r0 = _mm256_mul_pd(r0,rC);
             r1 = _mm256_add_pd(r1,rD);
-	    r2 = _mm256_mul_pd(r2,rE);
+	    	r2 = _mm256_mul_pd(r2,rE);
             r3 = _mm256_sub_pd(r3,rF);
-#ifndef ILP2
             r4 = _mm256_mul_pd(r4,rC);
             r5 = _mm256_add_pd(r5,rD);
-#endif
-#ifndef ILP
             r6 = _mm256_mul_pd(r6,rE);
             r7 = _mm256_sub_pd(r7,rF);
             r8 = _mm256_mul_pd(r8,rC);
             r9 = _mm256_add_pd(r9,rD);
             rA = _mm256_mul_pd(rA,rE);
             rB = _mm256_sub_pd(rB,rF);
-#endif
 
             i++;
         }
@@ -169,6 +165,10 @@ double test_AVX(double x,double y,size_t iterations){
     return out;
 }
 
+
+//
+// Used to get the time (in miliseconds)
+//
 double mdsecnd(void)
 {
           static double base;
@@ -181,12 +181,13 @@ double mdsecnd(void)
           return td-base;
 }
 
-double test_dp_mac_AVX(int tds,size_t iterations, int warmup){
+double run_test(int tds,size_t iterations, int printStats){
 
     double *sum = (double*)malloc(tds * sizeof(double));
-    double start = mdsecnd();
 
-#pragma omp parallel num_threads(tds)
+	double start = mdsecnd();
+
+	#pragma omp parallel num_threads(tds)
     {
         double ret = test_AVX(1.1,2.1,iterations);
         sum[omp_get_thread_num()] = ret;
@@ -195,18 +196,13 @@ double test_dp_mac_AVX(int tds,size_t iterations, int warmup){
     double stop = mdsecnd();
     double secs = stop - start;
 
-#ifdef ILP
-    unsigned long long ops = 24 * 1000 * iterations * tds * 4;
-#else
+	// Calculate the number of flops
+	//   - Each iteration contains 48,000 instructions
+	//   - Each instruction contains 4 flops
     unsigned long long ops = 48 * 1000 * iterations * tds * 4;
-#endif
 
-#ifdef ILP2
-    ops = 16 * 1000 * iterations * tds * 4;
-    //ops = 8 * 1000 * iterations * tds * 4;
-#endif
 
-    if (warmup == 0) {
+    if (printStats == 0) {
     	cout << "Threads = " << tds << endl;
     	cout << "Seconds = " << secs << endl;
     	cout << "FP Ops  = " << ops << endl;
@@ -221,7 +217,7 @@ double test_dp_mac_AVX(int tds,size_t iterations, int warmup){
 
     cout << "sum = " << out << endl;
     
-    if (warmup == 0) {
+    if (printStats == 0) {
     	cout << endl;
     }
 
@@ -229,6 +225,16 @@ double test_dp_mac_AVX(int tds,size_t iterations, int warmup){
     return ((double) ops) / secs;
 }
 
+
+
+//
+// Arg[1] - Number of threads
+// Arg[2] - Number of iterations
+// Arg[3] - Time to run (in seconds)
+//
+//  There are two mode: set Iterations or set Time
+//  If Time is set, then the number of iterations does not matter
+//
 int main(int argc, const char* argv[]) {
     
 	double start;
@@ -242,6 +248,7 @@ int main(int argc, const char* argv[]) {
 	if (argc >= 3) sec = atoi(argv[3]);
 
 
+	// Mode 1 : Fixed Time
 	if (sec != 0) {
         	//warmup	
 		start = mdsecnd();
@@ -258,22 +265,19 @@ int main(int argc, const char* argv[]) {
         	//test	
 		start = mdsecnd();
 		while (mdsecnd() - start < sec ) {
-			test_dp_mac_AVX(threads,2e6,1);
+			// Run for 2 million iterations, then check time
+			run_test(threads,2e6,1);
 		}
 		
 		tsc_stop();
 		socket_send("StopAVX");
 		tsc_print();
-
-
-        	//record performance	
-		//double perf = test_dp_mac_AVX(threads,2e6,0);
-		//tsc_printFileAll(perf / 1e9);
-		
-		
-
-	} else {
-		test_dp_mac_AVX(threads,iters * 1e6,0);
+	} 
+	
+	// Mode 2 : Fixed Iterations
+	else {
+	
+		run_test(threads,iters * 1e6,0);
 	}
 
 	return 0;
