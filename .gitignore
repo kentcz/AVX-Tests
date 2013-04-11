@@ -15,3 +15,7 @@
 *.exe
 *.out
 *.app
+
+avx_kernel_many.s
+avx
+*.tb6
