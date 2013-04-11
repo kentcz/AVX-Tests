@@ -107,7 +107,7 @@ int main(int argc, const char* argv[]) {
 
 
 		printf("warmup complete %f\n",mdsecnd() - start);
-		socket_send("StartAVX\n");
+		//socket_send("StartAVX\n");
 		tsc_start();
 
         	//test	
@@ -118,7 +118,7 @@ int main(int argc, const char* argv[]) {
 		}
 		
 		tsc_stop();
-		socket_send("StopAVX");
+		//socket_send("StopAVX");
 		tsc_print();
 	} 
 	
