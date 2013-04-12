@@ -6,8 +6,8 @@ KERNEL = ./kernels/c_original.cpp
 all : avx
 
 avx_kernel.o : avx_kernel.h avx_kernel.cpp
-	rm -f avx_kernel_many.s
-	for i in `seq 1 $(UNROLLS)`; do cat $(KERNEL) >> avx_kernel_many.s; done
+	rm -f kernel_include.cpp
+	for i in `seq 1 $(UNROLLS)`; do cat $(KERNEL) >> kernel_include.cpp; done
 	icc $(PPXFLAGS) -DUNROLLS=$(UNROLLS) -fopenmp -mavx -O3 -c -o avx_kernel.o avx_kernel_simple.cpp
 
 avx_bench.o : avx_bench.cpp
@@ -27,3 +27,4 @@ clean :
 	rm -f avx_kernel.o
 	rm -f avx_bench.o
 	rm -f avx_kernel_many.s
+	rm -f kernel_include.s

@@ -69,7 +69,7 @@ double avx_kernel(double x,double y,size_t iterations){
 			//    - 48*4 = 192 flops per loop
 			
 			// Inlude the Kernel
-			#include "avx_kernel_many.s"
+			#include "kernel_include.cpp"
 
 
             i++;
