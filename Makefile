@@ -8,7 +8,7 @@ all : avx
 avx_kernel.o : avx_kernel.h avx_kernel.cpp
 	rm -f kernel_include.cpp
 	for i in `seq 1 $(UNROLLS)`; do cat $(KERNEL) >> kernel_include.cpp; done
-	icc $(PPXFLAGS) -DUNROLLS=$(UNROLLS) -fopenmp -mavx -O3 -c -o avx_kernel.o avx_kernel_simple.cpp
+	icc $(PPXFLAGS) -DUNROLLS=$(UNROLLS) -fopenmp -mavx -O3 -c -o avx_kernel.o avx_kernel.cpp
 
 avx_bench.o : avx_bench.cpp
 	icc $(PPXFLAGS) -fopenmp -mavx -O3 -c -o avx_bench.o avx_bench.cpp
