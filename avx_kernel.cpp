@@ -2,6 +2,11 @@
 #include <stdlib.h>
 #include <immintrin.h>
 #include <sys/time.h>
+#include "init_array.h"
+
+#ifdef USE_IACA
+#include "/home/mic/iaca-lin32/include/iacaMarks.h"
+#endif
 
 #include <iostream>
 using namespace std;
@@ -30,6 +35,14 @@ inline __m256d operator * (const __m256d A, const __m256d B)
 double avx_kernel(double x,double y,size_t iterations){
     register __m256d r0,r1,r2,r3,r4,r5,r6,r7,r8,r9,rA,rB,rC,rD,rE,rF;
 
+	double *vals = (double *) _mm_malloc(16*4*sizeof(double),32);
+	init_array(vals,64);
+
+	//__declspec((align(32)) double constants[4] = {
+	//	0.37796447300922722721,
+	//};
+
+	/**
     //  Generate starting data.
     r0 = _mm256_set1_pd(x);
     r1 = _mm256_set1_pd(y);
@@ -51,30 +64,110 @@ double avx_kernel(double x,double y,size_t iterations){
     rD = _mm256_set1_pd(1.7320508075688772935);
     rE = _mm256_set1_pd(0.57735026918962576451);
     rF = _mm256_set1_pd(0.70710678118654752440);
+	**/
 
     unsigned long long iMASK = 0x800fffffffffffffull;
     __m256d MASK = _mm256_set1_pd(*(double*)&iMASK);
     __m256d vONE = _mm256_set1_pd(1.0);
+	
+
+	r0 = _mm256_load_pd(vals+0);
+	r1 = _mm256_load_pd(vals+4);
+	r2 = _mm256_load_pd(vals+8);
+	r3 = _mm256_load_pd(vals+12);
+	r4 = _mm256_load_pd(vals+16);
+	r5 = _mm256_load_pd(vals+20);
+	r6 = _mm256_load_pd(vals+24);
+	r7 = _mm256_load_pd(vals+28);
+	r8 = _mm256_load_pd(vals+32);
+	r9 = _mm256_load_pd(vals+36);
+	rA = _mm256_load_pd(vals+40);
+	rB = _mm256_load_pd(vals+44);
+	rC = _mm256_load_pd(vals+48);
+	rD = _mm256_load_pd(vals+52);
+	rE = _mm256_load_pd(vals+56);
+	rF = _mm256_load_pd(vals+60);
+
 
     size_t c = 0;
     while (c < iterations){
 
-
-//#pragma GCC push_options
-//#pragma GCC optimze("unroll-loops")
         size_t i = 0;
         while (i < 1000/UNROLLS) {
+
+#ifdef USE_IACA
+	IACA_START
+#endif
+
 
 			//    - 48 Instructions per loop
 			//    - 48*4 = 192 flops per loop
 			
 			// Inlude the Kernel
 			#include "kernel_include.cpp"
+			
+			/**
+			r0 = _mm256_add_pd(r0,rF);
+            r1 = _mm256_mul_pd(r1,rE);
+            r2 = _mm256_sub_pd(r2,rD);
+            r3 = _mm256_mul_pd(r3,rC);
+            r4 = _mm256_add_pd(r4,rF);
+            r5 = _mm256_mul_pd(r5,rE);
+            r6 = _mm256_sub_pd(r6,rD);
+            r7 = _mm256_mul_pd(r7,rC);
+            r8 = _mm256_add_pd(r8,rF);
+            r9 = _mm256_mul_pd(r9,rE);
+            rA = _mm256_sub_pd(rA,rD);
+            rB = _mm256_mul_pd(rB,rC);
+
+            r0 = _mm256_mul_pd(r0,rC);
+            r1 = _mm256_add_pd(r1,rD);
+            r2 = _mm256_mul_pd(r2,rE);
+            r3 = _mm256_sub_pd(r3,rF);
+            r4 = _mm256_mul_pd(r4,rC);
+            r5 = _mm256_add_pd(r5,rD);
+            r6 = _mm256_mul_pd(r6,rE);
+            r7 = _mm256_sub_pd(r7,rF);
+            r8 = _mm256_mul_pd(r8,rC);
+            r9 = _mm256_add_pd(r9,rD);
+            rA = _mm256_mul_pd(rA,rE);
+            rB = _mm256_sub_pd(rB,rF);
+
+            r0 = _mm256_add_pd(r0,rF);
+            r1 = _mm256_mul_pd(r1,rE);
+            r2 = _mm256_sub_pd(r2,rD);
+            r3 = _mm256_mul_pd(r3,rC);
+            r4 = _mm256_add_pd(r4,rF);
+            r5 = _mm256_mul_pd(r5,rE);
+            r6 = _mm256_sub_pd(r6,rD);
+            r7 = _mm256_mul_pd(r7,rC);
+            r8 = _mm256_add_pd(r8,rF);
+            r9 = _mm256_mul_pd(r9,rE);
+            rA = _mm256_sub_pd(rA,rD);
+            rB = _mm256_mul_pd(rB,rC);
+
+            r0 = _mm256_mul_pd(r0,rC);
+            r1 = _mm256_add_pd(r1,rD);
+            r2 = _mm256_mul_pd(r2,rE);
+            r3 = _mm256_sub_pd(r3,rF);
+            r4 = _mm256_mul_pd(r4,rC);
+            r5 = _mm256_add_pd(r5,rD);
+            r6 = _mm256_mul_pd(r6,rE);
+            r7 = _mm256_sub_pd(r7,rF);
+            r8 = _mm256_mul_pd(r8,rC);
+            r9 = _mm256_add_pd(r9,rD);
+            rA = _mm256_mul_pd(rA,rE);
+            rB = _mm256_sub_pd(rB,rF);
+			**/
+
+#ifdef USE_IACA
+	IACA_END
+#endif
+
 
 
             i++;
         }
-//#pragma GCC pop_options
 
 
 
@@ -128,5 +221,5 @@ double avx_kernel(double x,double y,size_t iterations){
     out += ((double*)&r0)[2];
     out += ((double*)&r0)[3];
 
-    return out;
+    return out + x + y;
 }
