@@ -35,9 +35,29 @@ scalar : scalar_bench.cpp
 aica : avx_kernel_aica.o
 	iaca -64 -arch IVB -o out.txt $^
 
+test_kernel.o : test_kernel.cpp simple_kernel.h
+	icc -g -mavx -c -o $@ $<
+
+test : test_kernel.o simple_kernel.o
+	icpc -mavx -O3 -o $@ $^
+
+simple_kernel.o : simple_kernel.asm
+	yasm -f elf64 -o $@ $<
+	#icc -mavx -O0 -S -o $@.asm $<
+	#icc -mavx -O0 -c -o $@ $<
+
+simple.o : simple.asm
+	yasm -f elf64 -l simple.lst -o $@ $<
+
+simple : simple.o
+	#gcc -lc -o $@ $^
+	ld -lc -o $@ $^
+	
+
 clean :
 	rm -f avx sse
 	rm -f avx_kernel.o
 	rm -f avx_bench.o
 	rm -f init_array.o
+	rm -f simple_kernel.o
 	rm -f $(KERNEL_INCLUDE)
