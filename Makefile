@@ -1,6 +1,6 @@
 PPXFLAGS = -DPPXHOST=\"$(PPX_LVHOST)\"
 
-UNROLLS = 20
+UNROLLS = 100
 KERNEL = ./kernels/asm_multOnly.cpp
 KERNEL_INCLUDE = kernel_include.cpp
 
@@ -11,9 +11,11 @@ $(KERNEL_INCLUDE) : $(KERNEL)
 	for i in `seq 1 $(UNROLLS)`; do cat $(KERNEL) >> $(KERNEL_INCLUDE); done
 	touch $(KERNEL)
 
-avx_kernel.o : avx_kernel.asm $(KERNEL_INCLUDE)
-	#icc -DUNROLLS=$(UNROLLS) -fopenmp -mavx -O3 -c -o $@ $<
-	yasm -f elf64 -o $@ $<
+avx_kernel.old : avx_kernel.cpp $(KERNEL_INCLUDE)
+	icc -DUNROLLS=$(UNROLLS) -fopenmp -mavx -O3 -c -o $@ $<
+
+avx_kernel.o : avx_kernel.asm
+	yasm -DUNROLLS=$(UNROLLS) -f elf64 -o $@ $<
 
 avx_kernel_aica.o : avx_kernel.cpp $(KERNEL_INCLUDE)
 	icc -g -DUSE_IACA=1 -DUNROLLS=$(UNROLLS) -fopenmp -mavx -O3 -c -o $@ $<

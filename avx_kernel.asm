@@ -65,7 +65,7 @@ outloop:
 		dec rsi
 
 
-		mov rax, 1000						; Iterate over inloop 1000 times
+		mov rax, 1000/UNROLLS				; Iterate over inloop 1000 times
 inloop:	
 		cmp rax, 0
 		jle e_outloop
@@ -74,55 +74,10 @@ inloop:
 		;
 		; Modify registers
 		;
-	
-		vmulpd ymm3, ymm3, ymm15
-		vmulpd ymm5, ymm5, ymm13
-		vmulpd ymm7, ymm7, ymm15
-		vmulpd ymm9, ymm9, ymm13
-		vmulpd ymm11, ymm11, ymm15
-		vmulpd ymm0, ymm0, ymm13
-		vaddpd ymm2, ymm2, ymm14
-		vaddpd ymm4, ymm4, ymm12
-		vaddpd ymm6, ymm6, ymm14
-		vaddpd ymm8, ymm8, ymm12
-		vaddpd ymm10, ymm10, ymm14
-		vaddpd ymm1, ymm1, ymm12
-		vaddpd ymm3, ymm3, ymm12
-		vaddpd ymm5, ymm5, ymm14
-		vaddpd ymm7, ymm7, ymm12
-		vaddpd ymm9, ymm9, ymm14
-		vaddpd ymm11, ymm11, ymm12
-		vaddpd ymm0, ymm0, ymm14
-		vmulpd ymm2, ymm2, ymm13
-		vmulpd ymm4, ymm4, ymm15
-		vmulpd ymm6, ymm6, ymm13
-		vmulpd ymm8, ymm8, ymm15
-		vmulpd ymm10, ymm10, ymm13
-		vmulpd ymm1, ymm1, ymm15
-		vmulpd ymm3, ymm3, ymm15
-		vmulpd ymm5, ymm5, ymm13
-		vmulpd ymm7, ymm7, ymm15
-		vmulpd ymm9, ymm9, ymm13
-		vmulpd ymm11, ymm11, ymm15
-		vmulpd ymm0, ymm0, ymm13
-		vaddpd ymm2, ymm2, ymm14
-		vaddpd ymm4, ymm4, ymm12
-		vaddpd ymm6, ymm6, ymm14
-		vaddpd ymm8, ymm8, ymm12
-		vaddpd ymm10, ymm10, ymm14
-		vaddpd ymm1, ymm1, ymm12
-		vaddpd ymm3, ymm3, ymm12
-		vaddpd ymm5, ymm5, ymm14
-		vaddpd ymm7, ymm7, ymm12
-		vaddpd ymm9, ymm9, ymm14
-		vaddpd ymm11, ymm11, ymm12
-		vaddpd ymm0, ymm0, ymm14
-		vmulpd ymm2, ymm2, ymm13
-		vmulpd ymm4, ymm4, ymm15
-		vmulpd ymm6, ymm6, ymm13
-		vmulpd ymm8, ymm8, ymm15
-		vmulpd ymm10, ymm10, ymm13
-		vmulpd ymm1, ymm1, ymm15
+
+%rep	UNROLLS 
+%include "./kernels/asm_original.asm"
+%endrep
 
 
 		jmp inloop
