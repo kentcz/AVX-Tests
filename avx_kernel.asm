@@ -77,9 +77,24 @@ inloop:
 
 ;%include "./kernels/asm_original.asm"
 
-%rep	UNROLLS 
-%include "KERNEL"
+;IACA START_MARKER
+%ifdef IACA
+		mov ebx, 111
+		db 0x64, 0x67, 0x90
+%endif
+
+;
+; Include and unroll the kernel
+;
+%rep	UNROLLS 	; Unroll
+%include "KERNEL" 	; Include the kernel file
 %endrep
+
+;IACA END_MARKER
+%ifdef IACA
+	mov ebx, 222
+	db 0x64, 0x67, 0x90
+%endif
 
 
 		jmp inloop

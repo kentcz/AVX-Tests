@@ -1,10 +1,18 @@
 PPXFLAGS = -DPPXHOST=\"$(PPX_LVHOST)\"
 
-UNROLLS = 100
+UNROLLS = 20
 KERNEL = ./kernels/asm_original.asm
 KERNEL_INCLUDE = kernel_include.cpp
 
-all : avx
+all : clean avx_kernel.iaca avx
+	@echo
+	@echo "\033[1mUnrolls: $(UNROLLS)\033[0m"
+	@echo "\033[1mKernel: $(KERNEL)\033[0m"
+	@cat out.txt | grep "Block Throughput"
+	@tput sgr0
+	@echo
+	./avx 4 4 0
+	./avx 4 4 360
 
 $(KERNEL_INCLUDE) : $(KERNEL)
 	rm -f $(KERNEL_INCLUDE)
@@ -15,7 +23,9 @@ avx_kernel.old : avx_kernel.cpp $(KERNEL_INCLUDE)
 	icc -DUNROLLS=$(UNROLLS) -fopenmp -mavx -O3 -c -o $@ $<
 
 avx_kernel.o : avx_kernel.asm
+	yasm -dIACA -dKERNEL=$(KERNEL) -dUNROLLS=$(UNROLLS) -f elf64 -o avx_kernel.o.iacs $<
 	yasm -dKERNEL=$(KERNEL) -dUNROLLS=$(UNROLLS) -f elf64 -o $@ $<
+
 
 avx_kernel_aica.o : avx_kernel.cpp $(KERNEL_INCLUDE)
 	icc -g -DUSE_IACA=1 -DUNROLLS=$(UNROLLS) -fopenmp -mavx -O3 -c -o $@ $<
@@ -26,7 +36,7 @@ init_array.o : init_array.cpp
 avx_bench.o : avx_bench.cpp
 	icc $(PPXFLAGS) -fopenmp -mavx -O3 -c -o avx_bench.o avx_bench.cpp
 
-avx : avx_bench.o avx_kernel.o init_array.o
+avx : avx_bench.o avx_kernel.o
 	icc $(PPXFLAGS) -fopenmp -mavx -O3 -o avx avx_bench.o avx_kernel.o init_array.o
 
 sse : sse_bench.cpp
@@ -35,8 +45,8 @@ sse : sse_bench.cpp
 scalar : scalar_bench.cpp
 	icpc $(PPXFLAGS) -openmp -o scalar scalar_bench.cpp
 
-aica : avx_kernel_aica.o
-	iaca -64 -arch IVB -o out.txt $^
+avx_kernel.iaca : avx_kernel.o
+	iaca -64 -arch IVB -o avx_kernel.iacs avx_kernel.o.iacs
 
 test_kernel.o : test_kernel.cpp simple_kernel.h
 	icc -g -mavx -c -o $@ $<
@@ -58,9 +68,7 @@ simple : simple.o
 	
 
 clean :
-	rm -f avx sse
-	rm -f avx_kernel.o
-	rm -f avx_bench.o
-	rm -f init_array.o
-	rm -f simple_kernel.o
+	rm -f avx sse avx_kernel.o avx_bench.o
+	rm -f init_array.o simple_kernel.o
+	rm -f avx_kernel.o.iaca avx_kernel.iaca
 	rm -f $(KERNEL_INCLUDE)

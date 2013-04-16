@@ -20,3 +20,5 @@ avx_kernel_many.s
 kernel_include.cpp
 avx
 *.tb6
+avx_kernel.o.iacs
+avx_kernel.iacs
