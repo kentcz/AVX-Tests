@@ -75,8 +75,10 @@ inloop:
 		; Modify registers
 		;
 
+;%include "./kernels/asm_original.asm"
+
 %rep	UNROLLS 
-%include "./kernels/asm_original.asm"
+%include "KERNEL"
 %endrep
 
 
