@@ -28,9 +28,9 @@ msk4:	dq	0x800fffffffffffff
 section .text
 BITS 64
 
-	global simple_kernel
+	global avx_kernel
 
-simple_kernel:
+avx_kernel:
 		push rbp
 		mov rbp, rsp
 

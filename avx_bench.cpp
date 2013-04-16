@@ -3,6 +3,7 @@
 #include <immintrin.h>
 #include <sys/time.h>
 #include <omp.h>
+#include <math.h>
 
 #include "avx_kernel.h"
 
@@ -13,7 +14,11 @@
 #include <iostream>
 using namespace std;
 
-
+void init_array(double *arr) {
+	for (int i=0; i < 64; i++) {
+		arr[i] = (double) 1.0001 + (0.00001 * (4*atan(1.0)) * i);
+	}
+}
 
 //
 // Used to get the time (in miliseconds)
@@ -32,14 +37,22 @@ double mdsecnd(void)
 
 double run_test(int tds,size_t iterations, int printStats){
 
+	// Initialize kernel values
+	double *vals = (double *) malloc(sizeof(double) * 64 * tds);
+	for (int w=0; w < tds; w++) {
+		init_array( &(vals[w*64]) );
+	}
+
+	// Create array for return values
     double *sum = (double*)malloc(tds * sizeof(double));
 
 	double start = mdsecnd();
 
 	#pragma omp parallel num_threads(tds)
     {
-        double ret = avx_kernel(1.1,2.1,iterations);
-        sum[omp_get_thread_num()] = ret;
+		int thread_id = omp_get_thread_num();
+        double ret = avx_kernel( &(vals[thread_id*64]), iterations);
+        sum[omp_get_thread_num()] = vals[thread_id*64];
     }
 
     double stop = mdsecnd();
@@ -71,6 +84,7 @@ double run_test(int tds,size_t iterations, int printStats){
     }
 
     free(sum);
+    free(vals);
     return ((double) ops) / secs;
 }
 

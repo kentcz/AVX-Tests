@@ -31,7 +31,7 @@ int main() {
 	printf("Inputs:\n");
 	printVals(vals);
 
-	int ret = simple_kernel(vals,1);
+	int ret = simple_kernel(vals,5e6);
 	printf("ret=%d\n",ret);
 
 	//ret = simple_kernel(vals,-3);
