@@ -1,24 +1,25 @@
 ; --------------------------------------------------------------------------
 ; simple_kernel.asm
 ;
-; NASM implementation of a function that returns the sum of all the elements
-; in a floating-point array.  The function has prototype:
+; NASM implementation of a basic floating point kernel
 ;
-;   double sum(double[] array, int length)
+;   int avx_kernel(double[] array, int iterations)
 ; --------------------------------------------------------------------------
 section .data
-msg:	db	"Hello World\n",
 
+; Sample data
 mypi1:	dq	3.14159
 mypi2:	dq	3.14159
 mypi3:	dq	3.14159
 mypi4:	dq	3.141590
 
+; VONE
 vone1:	dq	1.0
 vone2:	dq	1.0
 vone3:	dq	1.0
 vone4:	dq	1.0
 
+; MASK
 msk1:	dq	0x800fffffffffffff
 msk2:	dq	0x800fffffffffffff
 msk3:	dq	0x800fffffffffffff
@@ -29,7 +30,6 @@ section .text
 BITS 64
 
 	global avx_kernel
-
 avx_kernel:
 		push rbp
 		mov rbp, rsp
@@ -60,12 +60,12 @@ avx_kernel:
 
 
 outloop:
-		cmp rsi, 0
+		cmp rsi, 0							; Iterate until rsi is 0
 		jle done
 		dec rsi
 
 
-		mov rax, 1000
+		mov rax, 1000						; Iterate over inloop 1000 times
 inloop:	
 		cmp rax, 0
 		jle e_outloop
@@ -74,19 +74,7 @@ inloop:
 		;
 		; Modify registers
 		;
-		;vaddpd ymm0, ymm0, ymm12
-		;vaddpd ymm1, ymm1, ymm13
-		;vaddpd ymm2, ymm2, ymm14
-		;vaddpd ymm3, ymm3, ymm15
-		;vaddpd ymm4, ymm4, ymm12
-		;vaddpd ymm5, ymm5, ymm13
-		;vaddpd ymm6, ymm6, ymm14
-		;vaddpd ymm7, ymm7, ymm15
-		;vaddpd ymm8, ymm8, ymm12
-		;vaddpd ymm9, ymm9, ymm13
-		;vaddpd ymm10, ymm10, ymm14
-		;vaddpd ymm11, ymm11, ymm15
-
+	
 		vmulpd ymm3, ymm3, ymm15
 		vmulpd ymm5, ymm5, ymm13
 		vmulpd ymm7, ymm7, ymm15
@@ -145,7 +133,7 @@ e_outloop:
 		jle done
 
 		;
-		; Normalize
+		; Normalize AVX register
 		;
 		vmovupd ymm14, [msk1]			; Load MASK into ymm14
 		vmovupd ymm15, [vone1]			; Load VONE into ymm15
@@ -179,15 +167,8 @@ e_outloop:
 		vmovupd ymm14, [rdi + 448]			; Reload ymm14 from rdi[14]
 		vmovupd ymm15, [rdi + 480]			; Reload ymm15 from rdi[15]
 
-		;vmovupd ymm15, [mypi1]				; Load PI into ymm15
-
-
 		jmp outloop
 
-		;mov rax, 0
-		;cmp rsi, 65 						; jump if rsp <= 0
-		;jle done
-		;mov rax, rsi
 done:
 		;
 		; Writeback
