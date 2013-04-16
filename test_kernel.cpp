@@ -11,7 +11,7 @@ void init_array(double *arr) {
 	for (int i=0; i < LENGTH; i++) {
 		arr[i] = (double) 1.0001 + (0.00001 * (4*atan(1.0)) * i);
 	}
-	arr[0] = 4*atan((double)1);
+	//arr[0] = 4*atan((double)1);
 }
 
 void printVals(double *vals) {
@@ -31,7 +31,7 @@ int main() {
 	printf("Inputs:\n");
 	printVals(vals);
 
-	int ret = simple_kernel(vals,64);
+	int ret = simple_kernel(vals,1);
 	printf("ret=%d\n",ret);
 
 	//ret = simple_kernel(vals,-3);
